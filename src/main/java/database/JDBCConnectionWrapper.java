@@ -1,26 +1,45 @@
 package database;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.Properties;
 
 public class JDBCConnectionWrapper {
     private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     private static final String JDBC_URL = "jdbc:mysql://localhost/";
-    private static final String USER = "root";
-    private static final String PASSWORD = "Dan1690323";
+//    private static final String USER = "root";
+//    private static final String PASSWORD = "Dan1690323";
     private static final int TIMEOUT = 5;
 
     private Connection connection;
     public JDBCConnectionWrapper(String schema) {
-        try{
+        try {
             Class.forName(JDBC_DRIVER);
-            connection = DriverManager.getConnection(JDBC_URL + schema, USER, PASSWORD);
+
+
+            Properties props = new Properties();
+            try (InputStream input = getClass().getClassLoader().getResourceAsStream("db.properties")) {
+                if (input == null) {
+                    throw new RuntimeException("db.properties nu a fost găsit!");
+                }
+                props.load(input);
+            }
+
+            String user = props.getProperty("db.user");
+            String password = props.getProperty("db.password");
+
+            String url = "jdbc:mysql://localhost/" + schema + "?allowMultiQueries=true";
+
+            // Creează conexiunea
+            connection = DriverManager.getConnection(url, user, password);
+
             createTables();
-        }catch(ClassNotFoundException e){
-            e.printStackTrace();
-        }catch (SQLException e){
+
+        } catch (ClassNotFoundException | SQLException | IOException e) {
             e.printStackTrace();
         }
     }
