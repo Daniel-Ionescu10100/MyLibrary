@@ -40,3 +40,6 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+
+### ignore db.proerties###
+src/main/resources/db.properties
