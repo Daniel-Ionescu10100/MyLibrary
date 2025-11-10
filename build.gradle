@@ -26,11 +26,11 @@ javafx {
 }
 
 
-mainClassName='launcher.Main'
+mainClassName='org.Main'
 
 jar{
     manifest {
-        attributes 'Main-Class':'launcher.Main'
+        attributes 'Main-Class':'org.Main'
     }
 }
 

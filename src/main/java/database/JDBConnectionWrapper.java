@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Properties;
 
-public class JDBCConnectionWrapper {
+public class JDBConnectionWrapper {
     private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     private static final String JDBC_URL = "jdbc:mysql://localhost/";
 //    private static final String USER = "root";
@@ -16,7 +16,7 @@ public class JDBCConnectionWrapper {
     private static final int TIMEOUT = 5;
 
     private Connection connection;
-    public JDBCConnectionWrapper(String schema) {
+    public JDBConnectionWrapper(String schema) {
         try {
             Class.forName(JDBC_DRIVER);
 
