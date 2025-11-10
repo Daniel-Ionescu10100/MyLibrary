@@ -3,11 +3,11 @@ package database;
 public class DatabaseConnectionFactory {
     private static final String SCHEMA = "Library";
     private static final String TEST_SCHEMA ="test_library";
-    public static JDBCConnectionWrapper getConnectionWrapper(boolean test){
+    public static JDBConnectionWrapper getConnectionWrapper(boolean test){
         if(test){
-            return new JDBCConnectionWrapper(TEST_SCHEMA);
+            return new JDBConnectionWrapper(TEST_SCHEMA);
         }else{
-            return new JDBCConnectionWrapper(SCHEMA);
+            return new JDBConnectionWrapper(SCHEMA);
         }
 
     }
