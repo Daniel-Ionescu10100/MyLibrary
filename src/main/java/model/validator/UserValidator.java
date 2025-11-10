@@ -12,20 +12,49 @@ import java.util.regex.Pattern;
 public class UserValidator {
     private static final String EMAIL_VALIDATION_REGEX = "^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$";
     public static final int MIN_PASSWORD_LENGTH = 8;
-    private final List<String> errors = new ArrayList<>();
-    private final UserRepository userRepository;
+    private final List<String> errors;
+    private final User user;
 
-    public UserValidator(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserValidator(User user) {
+        this.user = user;
+        this.errors = new ArrayList<>();
     }
 
-    public void validate(String username, String password) {
-        errors.clear();
-        validatEmailUniqueness(username);
-        validateEmail(username);
-        validatePasswordLenght(password);
-        validatePasswordSpecial(password);
-        validatePasswordDigit(password);
+    public boolean validate() {
+        validateUsername(user.getUsername());
+        validatePassword(user.getPassword());
+        return errors.isEmpty();
+    }
+
+    private void validateUsername(String username) {
+        if(Pattern.compile(EMAIL_VALIDATION_REGEX).matcher(username).matches()) {
+            errors.add("Mail is not valid");
+        }
+    }
+
+    private void validatePassword(String password) {
+        if(password.length() < MIN_PASSWORD_LENGTH) {
+            errors.add(String.format("Password must be at least 8 characters long"));
+        }
+
+        if(!containSpecialCharacter(password)){
+            errors.add(String.format("Password must contain at least one special character"));
+
+        }
+        if (!containsDigit(password)){
+
+        }
+    }
+
+
+    private boolean containSpecialCharacter(String password) {
+        if(password == null || password.trim().isEmpty()){
+
+        }
+        Pattern specialCharacterPattern = Pattern.compile("[^A-Za-z0-9]");
+        Matcher specialCharacrerMatcher = specialCharacterPattern.matcher(password);
+
+        return specialCharacrerMatcher.find();
     }
 
     private void validatePasswordSpecial(String password) {
@@ -34,10 +63,8 @@ public class UserValidator {
         }
     }
 
-    private void validatePasswordDigit(String password) {
-        if(!password.matches(".*[!@#$%^&*()_+].*")){
-            errors.add("Password must contain at least one special character");
-        }
+    private boolean containsDigit(String password) {
+        return Pattern.compile(".*[0-9].*]").matcher(password).find();
     }
 
     private void validatePasswordLenght(String password) {

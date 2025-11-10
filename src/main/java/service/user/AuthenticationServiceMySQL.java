@@ -3,6 +3,8 @@ import model.Role;
 import model.User;
 import model.builder.UserBuilder;
 
+import model.validator.Notification;
+import model.validator.UserValidator;
 import repository.security.RightsRolesRepository;
 import repository.user.UserRepository;
 
@@ -22,8 +24,9 @@ public class AuthenticationServiceMySQL implements AuthenticationService {
         this.rightsRolesRepository = rightsRolesRepository;
     }
 
+    //Functionalitatea existbyUsername de adaugat!!!
     @Override
-    public boolean register(String username, String password) {
+    public Notification<Boolean> register(String username, String password) {
 
         Role customerRole = rightsRolesRepository.findRoleByTitle(CUSTOMER);
 
@@ -32,13 +35,23 @@ public class AuthenticationServiceMySQL implements AuthenticationService {
                 .setPassword(password)
                 .setRoles(Collections.singletonList(customerRole))
                 .build();
-        user.setPassword(hashPassword(password));
+        UserValidator userValidator = new UserValidator(user);
 
-        return userRepository.save(user);
+        boolean userValid = userValidator.validate();
+        Notification<Boolean> userRegisterNotification = new Notification<>();
+        if(!userValid) {
+            userValidator.getErrors().forEach(userRegisterNotification::addError);
+            userRegisterNotification.setResult(Boolean.FALSE);
+        }else{
+            user.setPassword(hashPassword(password));
+            userRegisterNotification.setResult(userRepository.save(user));
+        }
+
+        return userRegisterNotification;
     }
 
     @Override
-    public User login(String username, String password) {
+    public Notification<User> login(String username, String password) {
         return userRepository.findByUsernameAndPassword(username, hashPassword(password));
     }
 
