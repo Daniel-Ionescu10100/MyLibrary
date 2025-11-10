@@ -2,7 +2,7 @@ package repository.user;
 import model.User;
 import model.builder.UserBuilder;
 import repository.security.RightsRolesRepository;
-
+import model.validator.Notification;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -32,7 +32,8 @@ public class UserRepositoryMySQL implements UserRepository {
 
     /// RED FLAG SQL INJECTION
     @Override
-    public User findByUsernameAndPassword(String username, String password) {
+    public Notification<User> findByUsernameAndPassword(String username, String password) {
+        Notification<User> findByUserNameAndPasswordNotification = new Notification<>();
         try {
             Statement statement = connection.createStatement();
 
@@ -46,10 +47,15 @@ public class UserRepositoryMySQL implements UserRepository {
                         .setPassword(userResultSet.getString("password"))
                         .setRoles(rightsRolesRepository.findRolesForUser(userResultSet.getLong("id")))
                         .build();
-                return user;
+                findByUserNameAndPasswordNotification.setResult(user);
+            }
+            else {
+                findByUserNameAndPasswordNotification.addError("Invalidd Username or password!");
+                return findByUserNameAndPasswordNotification;
             }
         }catch (SQLException e) {
             System.out.println(e.toString());
+            findByUserNameAndPasswordNotification.addError("Something is wrong with the Database!");
         }
 
         return null;
