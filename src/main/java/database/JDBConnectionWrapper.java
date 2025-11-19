@@ -11,8 +11,6 @@ import java.util.Properties;
 public class JDBConnectionWrapper {
     private static final String JDBC_DRIVER = "com.mysql.cj.jdbc.Driver";
     private static final String JDBC_URL = "jdbc:mysql://localhost/";
-//    private static final String USER = "root";
-//    private static final String PASSWORD = "Dan1690323";
     private static final int TIMEOUT = 5;
 
     private Connection connection;

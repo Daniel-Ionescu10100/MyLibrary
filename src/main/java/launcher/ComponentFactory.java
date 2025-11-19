@@ -15,7 +15,7 @@ import java.sql.Connection;
 import java.util.List;
 
 public class ComponentFactory {
-    ///Modificata pentru a fi singleton si lazy load
+
     private final BookView bookView;
     private final BookController bookController;
     private final BookRepository bookRepository;
