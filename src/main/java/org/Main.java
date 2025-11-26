@@ -17,6 +17,8 @@ import service.book.BookService;
 import service.book.BookServiceImplementation;
 import service.user.AuthenticationService;
 import service.user.AuthenticationServiceMySQL;
+import service.user.UserService;
+import service.user.UserServiceImplementation;
 import view.BookDTO;
 import view.BookView;
 import view.LoginView;
@@ -44,7 +46,7 @@ public class Main extends Application {
 
         BookRepository bookRepository = new BookRepositoryMySQL(connection);
         BookService bookService = new BookServiceImplementation(bookRepository);
-
-        new LoginController(loginView, authenticationService, bookService);
+        UserService userService = new UserServiceImplementation(userRepository, rightsRolesRepository);
+        new LoginController(loginView, authenticationService, bookService, userService);
     }
 }

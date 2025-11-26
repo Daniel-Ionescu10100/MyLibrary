@@ -1,4 +1,5 @@
 package database;
+
 import repository.security.RightsRolesRepository;
 import repository.security.RightsRolesRepositoryMySQL;
 
@@ -14,17 +15,13 @@ import static database.Constants.Roles.ROLES;
 import static database.Constants.Schemas.SCHEMAS;
 import static database.Constants.getRolesRights;
 
-// Script - code that automates some steps or processes
-
 public class Bootstrap {
 
     private static RightsRolesRepository rightsRolesRepository;
 
     public static void main(String[] args) throws SQLException {
         dropAll();
-
         bootstrapTables();
-
         bootstrapUserData();
     }
 
@@ -35,27 +32,26 @@ public class Bootstrap {
             Connection connection = new JDBConnectionWrapper(schema).getConnection();
             Statement statement = connection.createStatement();
 
+            // IMPORTANT: ștergem în ordinea corectă (FK → TABLE)
             String[] dropStatements = {
-                    "TRUNCATE `role_right`;",
-                    "DROP TABLE `role_right`;",
-                    "TRUNCATE `right`;",
-                    "DROP TABLE `right`;",
-                    "TRUNCATE `user_role`;",
-                    "DROP TABLE `user_role`;",
-                    "TRUNCATE `role`;",
-                    "DROP TABLE  `book`, `role`, `user`;"
+                    "DROP TABLE IF EXISTS role_right;",
+                    "DROP TABLE IF EXISTS `right`;",
+                    "DROP TABLE IF EXISTS user_role;",
+                    "DROP TABLE IF EXISTS role;",
+                    "DROP TABLE IF EXISTS user;",
+                    "DROP TABLE IF EXISTS book;"
             };
 
-            Arrays.stream(dropStatements).forEach(dropStatement -> {
+            Arrays.stream(dropStatements).forEach(sql -> {
                 try {
-                    statement.execute(dropStatement);
+                    statement.execute(sql);
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
             });
         }
 
-        System.out.println("Done table bootstrap");
+        System.out.println("Done table drop");
     }
 
     private static void bootstrapTables() throws SQLException {
@@ -63,7 +59,6 @@ public class Bootstrap {
 
         for (String schema : SCHEMAS) {
             System.out.println("Bootstrapping " + schema + " schema");
-
 
             JDBConnectionWrapper connectionWrapper = new JDBConnectionWrapper(schema);
             Connection connection = connectionWrapper.getConnection();
@@ -113,13 +108,12 @@ public class Bootstrap {
 
             for (String right : rolesRights.get(role)) {
                 Long rightId = rightsRolesRepository.findRightByTitle(right).getId();
-
                 rightsRolesRepository.addRoleRight(roleId, rightId);
             }
         }
     }
 
-    private static void bootstrapUserRoles() throws SQLException {
-
+    private static void bootstrapUserRoles() {
+        // empty on purpose – will be added later
     }
 }

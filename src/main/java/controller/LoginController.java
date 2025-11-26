@@ -1,45 +1,45 @@
 package controller;
-import database.JDBConnectionWrapper;
+
+import database.Constants;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.stage.Stage;
 import mapper.BookMapper;
 import model.User;
-
 import model.validator.Notification;
-import model.validator.UserValidator;
-import repository.book.BookRepository;
-import repository.book.BookRepositoryMySQL;
 import service.book.BookService;
-import service.book.BookServiceImplementation;
 import service.user.AuthenticationService;
-import view.BookDTO;
-import view.BookView;
-import view.LoginView;
+import service.user.UserService;
+import view.*;
 
-import java.sql.Connection;
 import java.util.List;
-
-import static database.Constants.Schemas.PRODUCTION;
 
 public class LoginController {
 
     private final LoginView loginView;
     private final AuthenticationService authenticationService;
     private final BookService bookService;
+    private final UserService userService; // << ADĂUGAT, era necesar
 
-    public LoginController(LoginView loginView, AuthenticationService authenticationService, BookService bookService) {
+    public LoginController(LoginView loginView,
+                           AuthenticationService authenticationService,
+                           BookService bookService,
+                           UserService userService) {
+
         this.loginView = loginView;
         this.authenticationService = authenticationService;
+        this.bookService = bookService;
+        this.userService = userService;
+
         this.loginView.addLoginButtonListener(new LoginButtonListener());
         this.loginView.addRegisterButtonListener(new RegisterButtonListener());
-        this.bookService = bookService;
     }
 
     private class LoginButtonListener implements EventHandler<ActionEvent> {
 
         @Override
-        public void handle(javafx.event.ActionEvent event) {
+        public void handle(ActionEvent event) {
+
             String username = loginView.getUsername();
             String password = loginView.getPassword();
 
@@ -47,18 +47,58 @@ public class LoginController {
 
             if (loginNotification.hasError()) {
                 loginView.setActionTargetText(loginNotification.getFormatedErrors());
-
-            }else{
-                loginView.setActionTargetText("Login Successful!");
-
-                Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
-                BookMapper bookMapper = new BookMapper();
-                List<BookDTO> booksList = bookMapper.convertBookListToBookDTOList(bookService.findAll());
-                BookView bookView = new BookView(stage, booksList);
+                return;
             }
 
+            loginView.setActionTargetText("Login Successful!");
+            User user = loginNotification.getResult();
+
+            boolean isAdmin = user.getRoles().stream()
+                    .anyMatch(role -> role.getRole().equals(Constants.Roles.ADMINISTRATOR));
+
+            boolean isEmployee = user.getRoles().stream()
+                    .anyMatch(role -> role.getRole().equals(Constants.Roles.EMPLOYEE));
+
+            boolean isCustomer = user.getRoles().stream()
+                    .anyMatch(role -> role.getRole().equals(Constants.Roles.CUSTOMER));
+
+            Stage stage = loginView.getStage();
+            BookMapper bookMapper = new BookMapper();
+
+            if (isAdmin) {
+
+                AdminView adminView = new AdminView(stage);
+
+                AdminController adminController =
+                        new AdminController(adminView, bookService, userService);
+
+                stage.setScene(adminView.getScene());
+                return;
+            }
+
+            if (isEmployee) {
+
+                List<BookDTO> booksList = bookMapper.convertBookListToBookDTOList(bookService.findAll());
+                BookView bookView = new BookView(stage, booksList);
+                BookController bookController = new BookController(bookView, bookService);
+                stage.setScene(bookView.getScene());
+            }
+
+            if (isCustomer) {
+
+                List<BookDTO> booksList =
+                        bookMapper.convertBookListToBookDTOList(bookService.findAll());
+
+                BookViewCustomer bookViewCustomer = new BookViewCustomer(stage, booksList);
+
+                BookControllerCustomer customerController =
+                        new BookControllerCustomer(bookViewCustomer, bookService);
+
+                stage.setScene(bookViewCustomer.getScene());
+            }
         }
     }
+
     private class RegisterButtonListener implements EventHandler<ActionEvent> {
 
         @Override
@@ -66,14 +106,14 @@ public class LoginController {
             String username = loginView.getUsername();
             String password = loginView.getPassword();
 
-            Notification<Boolean> regiserNotification = authenticationService.register(username, password);
+            Notification<Boolean> registerNotification =
+                    authenticationService.register(username, password);
 
-            if (regiserNotification.hasError()){
-                    loginView.setActionTargetText(regiserNotification.getFormatedErrors());
-                }else{
-                    loginView.setActionTargetText("Register successful!");
-                }
-
+            if (registerNotification.hasError()) {
+                loginView.setActionTargetText(registerNotification.getFormatedErrors());
+            } else {
+                loginView.setActionTargetText("Register successful!");
+            }
         }
     }
 }

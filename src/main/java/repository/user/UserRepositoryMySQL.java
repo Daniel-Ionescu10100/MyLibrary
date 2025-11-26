@@ -8,6 +8,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 
 import static database.Constants.Tables.USER;
@@ -26,8 +27,27 @@ public class UserRepositoryMySQL implements UserRepository {
 
     @Override
     public List<User> findAll() {
-        return null;
+        List<User> users = new ArrayList<>();
+        try {
+            String sql = "SELECT * FROM user";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet rs = statement.executeQuery();
+
+            while (rs.next()) {
+                User user = new User();
+                user.setId(rs.getLong("id"));
+                user.setUsername(rs.getString("username"));
+                user.setPassword(rs.getString("password"));
+                user.setRoles(rightsRolesRepository.findRolesForUser(user.getId()));
+
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return users;
     }
+
 
 
 
@@ -91,6 +111,25 @@ public class UserRepositoryMySQL implements UserRepository {
         }
 
     }
+    @Override
+    public boolean delete(Long id) {
+        try {
+            PreparedStatement deleteRolesStmt =
+                    connection.prepareStatement("DELETE FROM user_role WHERE user_id = ?");
+            deleteRolesStmt.setLong(1, id);
+            deleteRolesStmt.executeUpdate();
+
+            PreparedStatement deleteUserStmt =
+                    connection.prepareStatement("DELETE FROM user WHERE id = ?");
+            deleteUserStmt.setLong(1, id);
+
+            return deleteUserStmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     @Override
     public void removeAll() {
@@ -118,6 +157,8 @@ public class UserRepositoryMySQL implements UserRepository {
             return false;
         }
     }
+
+
 
 
 
