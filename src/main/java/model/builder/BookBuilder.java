@@ -28,6 +28,16 @@ public class BookBuilder {
         return this;
     }
 
+    public BookBuilder setQuantity(int quantity) {
+        book.setQuantity(quantity);
+        return this;
+    }
+
+    public BookBuilder setPrice(double price) {
+        book.setPrice(price);
+        return this;
+    }
+
     public Book build() {
         return book;
     }

@@ -12,6 +12,8 @@ import service.book.BookService;
 import service.book.BookServiceImplementation;
 import service.user.AuthenticationService;
 import service.user.AuthenticationServiceMySQL;
+import service.user.UserService;
+import service.user.UserServiceImplementation;
 import view.LoginView;
 
 import java.sql.Connection;
@@ -46,8 +48,12 @@ public class LoginComponentFactory {
         this.loginView = new LoginView(stage);
         this.bookRepository = new BookRepositoryMySQL(connection);
         this.bookService = new BookServiceImplementation(bookRepository);
-        this.loginController = new LoginController(loginView, authenticationService,bookService);
-
+        UserService userService = new UserServiceImplementation(this.userRepository, this.rightsRolesRepository);
+        this.loginController = new LoginController(
+                loginView,
+                authenticationService,
+                bookService, userService
+        );
     }
 
     public static Stage getStage(){

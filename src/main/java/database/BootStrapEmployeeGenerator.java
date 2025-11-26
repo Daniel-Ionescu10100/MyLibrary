@@ -1,33 +1,33 @@
-package service.user;
+package database;
+
 import model.Role;
 import model.User;
 import model.builder.UserBuilder;
-
 import model.validator.Notification;
 import model.validator.UserValidator;
 import repository.security.RightsRolesRepository;
+import repository.security.RightsRolesRepositoryMySQL;
 import repository.user.UserRepository;
+import repository.user.UserRepositoryMySQL;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
+import java.sql.Connection;
 import java.util.Collections;
 
-import static database.Constants.Roles.CUSTOMER;
+import static database.Constants.Roles.ADMINISTRATOR;
+import static database.Constants.Roles.EMPLOYEE;
+import static database.Constants.Schemas.PRODUCTION;
 
-public class AuthenticationServiceMySQL implements AuthenticationService {
+public class BootStrapEmployeeGenerator {
+    public static void main(String[] args) {
+        final Connection connection = new JDBConnectionWrapper(PRODUCTION).getConnection();
+        final RightsRolesRepository rightsRolesRepository = new RightsRolesRepositoryMySQL(connection);
+        final UserRepository userRepository = new UserRepositoryMySQL(connection, rightsRolesRepository);
+        String password = "Employee@Employee";
+        String username = "Employee@Employee";
 
-    private final UserRepository userRepository;
-    private final RightsRolesRepository rightsRolesRepository;
-
-    public AuthenticationServiceMySQL(UserRepository userRepository, RightsRolesRepository rightsRolesRepository) {
-        this.userRepository = userRepository;
-        this.rightsRolesRepository = rightsRolesRepository;
-    }
-
-    @Override
-    public Notification<Boolean> register(String username, String password) {
-
-        Role customerRole = rightsRolesRepository.findRoleByTitle(CUSTOMER);
+        Role customerRole = rightsRolesRepository.findRoleByTitle(EMPLOYEE);
 
         User user = new UserBuilder()
                 .setUsername(username)
@@ -45,21 +45,9 @@ public class AuthenticationServiceMySQL implements AuthenticationService {
             user.setPassword(hashPassword(password));
             userRegisterNotification.setResult(userRepository.save(user));
         }
-
-        return userRegisterNotification;
     }
 
-    @Override
-    public Notification<User> login(String username, String password) {
-        return userRepository.findByUsernameAndPassword(username, hashPassword(password));
-    }
-
-    @Override
-    public boolean logout(User user) {
-        return false;
-    }
-
-    private String hashPassword(String password) {
+    private static String hashPassword(String password) {
         try {
             // Sercured Hash Algorithm - 256
             // 1 byte = 8 biți

@@ -24,9 +24,11 @@ public class LoginView {
     private Button signInButton;
     private Button logInButton;
     private Text actiontarget;
+    private Stage stage;
 
     public LoginView(Stage primaryStage) {
         primaryStage.setTitle("Book Store");
+        this.stage = primaryStage;
 
         GridPane gridPane = new GridPane();
         initializeGridPane(gridPane);
@@ -39,6 +41,10 @@ public class LoginView {
         initializeFields(gridPane);
 
         primaryStage.show();
+    }
+
+    public Stage getStage() {
+        return stage;
     }
 
     private void initializeGridPane(GridPane gridPane){

@@ -18,6 +18,7 @@ public class BookController {
 
         this.bookView.addSaveButtonListener(new SaveButtonListener());
         this.bookView.addDeleteButtonListener(new DeleteButtonListener());
+        this.bookView.addBuyButtonListener(new BuyButtonListener());
     }
 
     private class SaveButtonListener implements EventHandler<ActionEvent> {
@@ -26,12 +27,18 @@ public class BookController {
         public void handle(ActionEvent actionEvent) {
             String title = bookView.getTitle();
             String author = bookView.getAuthor();
+            String quantityStr = bookView.getQuantity();
+            String priceStr = bookView.getPrice();
 
-            if(title.isEmpty() || author.isEmpty()) {
+            if(title.isEmpty() || author.isEmpty() || quantityStr.isEmpty()|| priceStr.isEmpty()) {
                 bookView.addDisplayAlertMessage("Save Error","Problem at Author or Title fields","Cannot have empty author or title fields");
 
             }else{
-                BookDTO bookDTO = new BookDTOBuilder().setTitle(title).setAuthor(author).build();
+                int quantity;
+                double price;
+                quantity = Integer.parseInt(quantityStr);
+                price = Double.parseDouble(priceStr);
+                BookDTO bookDTO = new BookDTOBuilder().setTitle(title).setAuthor(author).setQuantity(quantity).setPrice(price).build();
                 boolean saveBook = bookService.save(BookMapper.convertBookDTOToBook(bookDTO));
                 if(saveBook){
                     bookView.addDisplayAlertMessage("Successful","Book Added","Successfully was successfuly added to the book");
@@ -61,6 +68,34 @@ public class BookController {
             }else{
                 bookView.addDisplayAlertMessage("Delete Error","Problem at deleting book","You must select a book before delete button");
 
+            }
+        }
+    }
+
+
+    public class BuyButtonListener implements EventHandler<ActionEvent> {
+
+        @Override
+        public void handle(ActionEvent actionEvent) {
+            BookDTO bookDTO = (BookDTO) bookView.getBookTableView().getSelectionModel().getSelectedItem();
+
+            if(bookDTO != null){
+                if(bookDTO.getQuantity() > 0) {
+                    bookDTO.setQuantity(bookDTO.getQuantity() - 1);
+                    boolean buySuccessful = bookService.buy(BookMapper.convertBookDTOToBook(bookDTO));
+
+                    if(buySuccessful){
+                        bookView.addDisplayAlertMessage("Buy Successful","Book Purchased","Cartea a fost cumpărată cu succes! Cantitate rămasă: " + bookDTO.getQuantity());
+                        bookView.getBookTableView().refresh();
+                    }else{
+                        bookDTO.setQuantity(bookDTO.getQuantity() + 1);
+                        bookView.addDisplayAlertMessage("Buy Error","Problem at buying book","A fost o problemă la cumpărarea cărții. Încercați din nou.");
+                    }
+                } else {
+                    bookView.addDisplayAlertMessage("Buy Error","Book is out of stock","Cartea nu mai este în stoc.");
+                }
+            }else{
+                bookView.addDisplayAlertMessage("Buy Error","Problem at buying book","Trebuie să selectați o carte înainte de a apăsa Cumpără.");
             }
         }
     }

@@ -8,31 +8,22 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
+
 import java.util.List;
 
-public class BookView {
+public class BookViewCustomer{
 
     private TableView bookTableView;
     private final ObservableList<BookDTO> booksObservableList;
-    private TextField authorTextField;
-    private TextField titleTextField;
     private TextField quantityTextField;
-    private TextField BuyTextField;
-    private Label authorLabel;
-    private Label titleLabel;
     private Label quantityLabel;
-    private Label buyLabel;
-    private Button saveButton;
-    private Button deleteButton;
     private Button buyButton;
     private Scene scene;
 
-    public BookView(Stage primaryStage, List<BookDTO> books) {
+    public BookViewCustomer(Stage primaryStage, List<BookDTO> books) {
         primaryStage.setTitle("Library");
 
         GridPane gridPane = new GridPane();
@@ -76,43 +67,17 @@ public class BookView {
     }
 
     private void initSaveOptions(GridPane gridPane) {
-        titleLabel = new Label("Title");
-        gridPane.add(titleLabel,1,1);
-        titleTextField = new TextField();
-        gridPane.add(titleTextField,2,1);
-
-        authorLabel = new Label("Author");
-        gridPane.add(authorLabel,3,1);
-        authorTextField = new TextField();
-        gridPane.add(authorTextField,4,1);
-
-        buyLabel = new Label("Price");
-        gridPane.add(buyLabel,1,2);
-        BuyTextField = new TextField();
-        gridPane.add(BuyTextField,2,2);
 
         quantityLabel = new Label("Quantity");
-        gridPane.add(quantityLabel,3,2);
+        gridPane.add(quantityLabel,1,1);
         quantityTextField = new TextField();
-        gridPane.add(quantityTextField,4,2);
+        gridPane.add(quantityTextField,2,1);
 
-        saveButton = new Button("Save");
-        gridPane.add(saveButton,6,1);
-
-        deleteButton = new Button("Delete");
-        gridPane.add(deleteButton,7,1);
 
         buyButton = new Button("Buy");
-        gridPane.add(buyButton,6,2);
+        gridPane.add(buyButton,3,1);
     }
 
-    public void addSaveButtonListener(EventHandler<ActionEvent> saveButtonListener) {
-        saveButton.setOnAction(saveButtonListener);
-    }
-
-    public void addDeleteButtonListener(EventHandler<ActionEvent> deleteButtonListener) {
-        deleteButton.setOnAction(deleteButtonListener);
-    }
 
     public void addBuyButtonListener(EventHandler<ActionEvent> buyButtonListener) {
         buyButton.setOnAction(buyButtonListener);
@@ -127,13 +92,6 @@ public class BookView {
         alert.showAndWait();
     }
 
-    public String getTitle(){
-        return titleTextField.getText();
-    }
-
-    public String getAuthor(){
-        return authorTextField.getText();
-    }
 
     public void addBookToObservableList(BookDTO bookDTO) {
         this.booksObservableList.add(bookDTO);
@@ -150,7 +108,5 @@ public class BookView {
     public String getQuantity() {
         return quantityTextField.getText();
     }
-    public String getPrice() {
-        return BuyTextField.getText();
-    }
+
 }
