@@ -7,7 +7,6 @@ public class Book {
     private String titlu;
     private String author;
     public LocalDate publishedDate;
-    /// Daniel
     public Integer quantity;
     public Double price;
 

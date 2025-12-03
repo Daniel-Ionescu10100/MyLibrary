@@ -5,6 +5,7 @@ import model.Role;
 import repository.security.RightsRolesRepository;
 import repository.user.UserRepository;
 import view.UserDTO;
+import model.User;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -19,6 +20,7 @@ public class UserServiceImplementation implements UserService {
         this.userRepository = userRepository;
         this.rightsRolesRepository = rightsRolesRepository;
     }
+
 
     @Override
     public boolean addUser(String username, String password, String role) {
@@ -45,6 +47,21 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
+    public User findByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public boolean assignRoleToUser(Long userId, String roleTitle) {
+        Role dbRole = rightsRolesRepository.findRoleByTitle(roleTitle.toLowerCase());
+        if (dbRole == null) {
+            return false;
+        }
+        rightsRolesRepository.deleteRolesForUser(userId);
+        return rightsRolesRepository.addRoleToUser(userId, dbRole.getId());
+    }
+
+    @Override
     public List<UserDTO> findAllUsers() {
         return userRepository.findAll()
                 .stream()
@@ -55,5 +72,21 @@ public class UserServiceImplementation implements UserService {
                 ))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<UserDTO> findAllEmployees() {
+        return userRepository.findAll()
+                .stream()
+                .filter(u -> u.getRoles().get(0).getRole().equalsIgnoreCase("employee"))
+                .map(u -> new UserDTO(
+                        u.getId(),
+                        u.getUsername(),
+                        "employee"
+                ))
+                .collect(Collectors.toList());
+    }
+
+
+
 }
 

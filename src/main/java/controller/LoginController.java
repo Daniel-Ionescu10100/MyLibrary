@@ -8,6 +8,7 @@ import mapper.BookMapper;
 import model.User;
 import model.validator.Notification;
 import service.book.BookService;
+import service.sale.SaleService;
 import service.user.AuthenticationService;
 import service.user.UserService;
 import view.*;
@@ -19,17 +20,20 @@ public class LoginController {
     private final LoginView loginView;
     private final AuthenticationService authenticationService;
     private final BookService bookService;
-    private final UserService userService; // << ADĂUGAT, era necesar
+    private final UserService userService;
+    private final SaleService saleService;
 
     public LoginController(LoginView loginView,
                            AuthenticationService authenticationService,
                            BookService bookService,
-                           UserService userService) {
+                           UserService userService,
+                           SaleService saleService) {
 
         this.loginView = loginView;
         this.authenticationService = authenticationService;
         this.bookService = bookService;
         this.userService = userService;
+        this.saleService = saleService;
 
         this.loginView.addLoginButtonListener(new LoginButtonListener());
         this.loginView.addRegisterButtonListener(new RegisterButtonListener());
@@ -53,6 +57,7 @@ public class LoginController {
             loginView.setActionTargetText("Login Successful!");
             User user = loginNotification.getResult();
 
+
             boolean isAdmin = user.getRoles().stream()
                     .anyMatch(role -> role.getRole().equals(Constants.Roles.ADMINISTRATOR));
 
@@ -70,7 +75,7 @@ public class LoginController {
                 AdminView adminView = new AdminView(stage);
 
                 AdminController adminController =
-                        new AdminController(adminView, bookService, userService);
+                        new AdminController(adminView, bookService, userService, authenticationService, saleService);
 
                 stage.setScene(adminView.getScene());
                 return;
@@ -91,8 +96,9 @@ public class LoginController {
 
                 BookViewCustomer bookViewCustomer = new BookViewCustomer(stage, booksList);
 
+                bookViewCustomer.setCurrentCustomerId(user.getId());
                 BookControllerCustomer customerController =
-                        new BookControllerCustomer(bookViewCustomer, bookService);
+                        new BookControllerCustomer(bookViewCustomer, bookService, userService, saleService);
 
                 stage.setScene(bookViewCustomer.getScene());
             }

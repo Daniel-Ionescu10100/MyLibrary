@@ -32,12 +32,12 @@ public class Bootstrap {
             Connection connection = new JDBConnectionWrapper(schema).getConnection();
             Statement statement = connection.createStatement();
 
-            // IMPORTANT: ștergem în ordinea corectă (FK → TABLE)
             String[] dropStatements = {
                     "DROP TABLE IF EXISTS role_right;",
                     "DROP TABLE IF EXISTS `right`;",
                     "DROP TABLE IF EXISTS user_role;",
                     "DROP TABLE IF EXISTS role;",
+                    "DROP TABLE IF EXISTS sale;",
                     "DROP TABLE IF EXISTS user;",
                     "DROP TABLE IF EXISTS book;"
             };

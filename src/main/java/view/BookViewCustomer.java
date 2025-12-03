@@ -16,6 +16,8 @@ import java.util.List;
 
 public class BookViewCustomer{
 
+    private long currentCustomerId;
+
     private TableView bookTableView;
     private final ObservableList<BookDTO> booksObservableList;
     private TextField quantityTextField;
@@ -104,6 +106,16 @@ public class BookViewCustomer{
     public TableView getBookTableView() {
         return bookTableView;
     }
+
+
+    public void setCurrentCustomerId(long id) {
+        this.currentCustomerId = id;
+    }
+
+    public long getCurrentCustomerId() {
+        return currentCustomerId;
+    }
+
 
     public String getQuantity() {
         return quantityTextField.getText();

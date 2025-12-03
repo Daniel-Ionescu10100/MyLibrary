@@ -32,7 +32,6 @@ public class JDBConnectionWrapper {
 
             String url = "jdbc:mysql://localhost/" + schema + "?allowMultiQueries=true";
 
-            // Creează conexiunea
             connection = DriverManager.getConnection(url, user, password);
 
 

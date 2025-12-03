@@ -1,11 +1,6 @@
 package database;
 
-import static database.Constants.Tables.BOOK;
-import static database.Constants.Tables.RIGHT;
-import static database.Constants.Tables.ROLE;
-import static database.Constants.Tables.ROLE_RIGHT;
-import static database.Constants.Tables.USER;
-import static database.Constants.Tables.USER_ROLE;
+import static database.Constants.Tables.*;
 
 public class SQLTableCreationFactory {
 
@@ -76,6 +71,30 @@ public class SQLTableCreationFactory {
                     "    REFERENCES role (id)" +
                     "    ON DELETE CASCADE" +
                     "    ON UPDATE CASCADE);";
+            case SALE -> "CREATE TABLE IF NOT EXISTS sale (" +
+                    "  id INT NOT NULL AUTO_INCREMENT," +
+                    "  employee_id INT NOT NULL," +
+                    "  customer_id INT NOT NULL," +
+                    "  book_author VARCHAR(255) NOT NULL," +
+                    "  book_title VARCHAR(255) NOT NULL," +
+                    "  quantity INT NOT NULL," +
+                    "  sale_date DATETIME NOT NULL," +
+                    "  total_cost DOUBLE NOT NULL," +
+                    "  PRIMARY KEY (id)," +
+                    "  UNIQUE INDEX id_UNIQUE (id ASC)," +
+                    "  INDEX employee_id_idx (employee_id ASC)," +
+                    "  INDEX customer_id_idx (customer_id ASC)," +
+                    "  CONSTRAINT employee_fkid" +
+                    "    FOREIGN KEY (employee_id)" +
+                    "    REFERENCES user (id)" +
+                    "    ON DELETE CASCADE" +
+                    "    ON UPDATE CASCADE," +
+                    "  CONSTRAINT customer_fkid" +
+                    "    FOREIGN KEY (customer_id)" +
+                    "    REFERENCES user (id)" +
+                    "    ON DELETE CASCADE" +
+                    "    ON UPDATE CASCADE" +
+                    ");";
             default -> "";
         };
     }

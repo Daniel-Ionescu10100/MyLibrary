@@ -9,12 +9,16 @@ import model.Book;
 import model.validator.UserValidator;
 import repository.book.BookRepository;
 import repository.book.BookRepositoryMySQL;
+import repository.sale.SaleRepository;
+import repository.sale.SaleRepositoryMySQL;
 import repository.security.RightsRolesRepository;
 import repository.security.RightsRolesRepositoryMySQL;
 import repository.user.UserRepository;
 import repository.user.UserRepositoryMySQL;
 import service.book.BookService;
 import service.book.BookServiceImplementation;
+import service.sale.SaleService;
+import service.sale.SaleServiceImplementation;
 import service.user.AuthenticationService;
 import service.user.AuthenticationServiceMySQL;
 import service.user.UserService;
@@ -47,6 +51,8 @@ public class Main extends Application {
         BookRepository bookRepository = new BookRepositoryMySQL(connection);
         BookService bookService = new BookServiceImplementation(bookRepository);
         UserService userService = new UserServiceImplementation(userRepository, rightsRolesRepository);
-        new LoginController(loginView, authenticationService, bookService, userService);
+        SaleRepository saleRepository = new SaleRepositoryMySQL(connection);
+        SaleService saleService = new SaleServiceImplementation(saleRepository);
+        new LoginController(loginView, authenticationService, bookService, userService, saleService);
     }
 }
