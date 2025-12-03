@@ -33,6 +33,7 @@ public class EmployeeView {
     private PasswordField passwordTextField;
     private Label roleLabel;
     private ComboBox<String> roleComboBox;
+    private Button makeReportButton;
 
 
     public EmployeeView(Stage primaryStage, List<UserDTO> users) {
@@ -106,6 +107,8 @@ public class EmployeeView {
         gridPane.add(addEmployeeButton, 5, 2);
         removeEmployeeButton = new Button("Remove Employee");
         gridPane.add(removeEmployeeButton, 6, 2);
+        makeReportButton = new Button("Make Report");
+        gridPane.add(makeReportButton, 5, 3);
     }
 
 
@@ -161,4 +164,7 @@ public class EmployeeView {
         alert.showAndWait();
     }
 
+    public void addMakeReportButtonListener(EventHandler<ActionEvent> event) {
+        this.makeReportButton.setOnAction(event);
+    }
 }

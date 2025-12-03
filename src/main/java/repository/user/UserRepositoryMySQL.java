@@ -65,6 +65,7 @@ public class UserRepositoryMySQL implements UserRepository {
             if (userResultSet.next())
             {
                 User user = new UserBuilder()
+                        .setId(userResultSet.getLong("id"))
                         .setUsername(userResultSet.getString("username"))
                         .setPassword(userResultSet.getString("password"))
                         .setRoles(rightsRolesRepository.findRolesForUser(userResultSet.getLong("id")))
@@ -158,8 +159,27 @@ public class UserRepositoryMySQL implements UserRepository {
         }
     }
 
+    @Override
+    public User findByUsername(String username) {
+        try {
+            PreparedStatement stmt = connection.prepareStatement(
+                    "SELECT * FROM user WHERE username = ?"
+            );
+            stmt.setString(1, username);
+            ResultSet rs = stmt.executeQuery();
 
-
-
-
+            if (rs.next()) {
+                User user = new UserBuilder()
+                        .setId(rs.getLong("id"))
+                        .setUsername(rs.getString("username"))
+                        .setPassword(rs.getString("password"))
+                        .setRoles(rightsRolesRepository.findRolesForUser(rs.getLong("id")))
+                        .build();
+                return user;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }

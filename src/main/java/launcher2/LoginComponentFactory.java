@@ -4,12 +4,16 @@ import database.DatabaseConnectionFactory;
 import javafx.stage.Stage;
 import repository.book.BookRepository;
 import repository.book.BookRepositoryMySQL;
+import repository.sale.SaleRepository;
+import repository.sale.SaleRepositoryMySQL;
 import repository.security.RightsRolesRepository;
 import repository.security.RightsRolesRepositoryMySQL;
 import repository.user.UserRepository;
 import repository.user.UserRepositoryMySQL;
 import service.book.BookService;
 import service.book.BookServiceImplementation;
+import service.sale.SaleService;
+import service.sale.SaleServiceImplementation;
 import service.user.AuthenticationService;
 import service.user.AuthenticationServiceMySQL;
 import service.user.UserService;
@@ -30,6 +34,9 @@ public class LoginComponentFactory {
     private static Boolean componentsForTests;
     private static Stage stage;
 
+    private final SaleRepository saleRepository;
+    private final SaleService saleService;
+
     public static LoginComponentFactory getInstance(Boolean aComponentsForTests, Stage aStage) {
         if (instance == null) {
             componentsForTests = aComponentsForTests;
@@ -49,10 +56,12 @@ public class LoginComponentFactory {
         this.bookRepository = new BookRepositoryMySQL(connection);
         this.bookService = new BookServiceImplementation(bookRepository);
         UserService userService = new UserServiceImplementation(this.userRepository, this.rightsRolesRepository);
+        this.saleRepository = new SaleRepositoryMySQL(connection);
+        this.saleService = new SaleServiceImplementation(this.saleRepository);
         this.loginController = new LoginController(
                 loginView,
                 authenticationService,
-                bookService, userService
+                bookService, userService,saleService
         );
     }
 
